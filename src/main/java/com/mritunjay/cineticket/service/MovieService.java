@@ -1,12 +1,15 @@
 package com.mritunjay.cineticket.service;
 
+import com.mritunjay.cineticket.constants.ExceptionConstants;
 import com.mritunjay.cineticket.dto.movie.MovieRequestDTO;
 import com.mritunjay.cineticket.enums.Genre;
+import com.mritunjay.cineticket.exception.MovieNotFoundException;
 import com.mritunjay.cineticket.model.Movie;
 import com.mritunjay.cineticket.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,7 +28,7 @@ public class MovieService {
 
     public Movie getMovieById(Long movieId) {
         return movieRepository.findById(movieId)
-                //.orElseThrow(MovieNotzFoundException);
+                .orElseThrow(() -> new MovieNotFoundException(ExceptionConstants.MOVIE_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
     public Movie createNewMovie(MovieRequestDTO movieRequestDTO) {
@@ -55,7 +58,7 @@ public class MovieService {
                     movie.setMovieDuration(movieRequestDTO.getMovieDuration());
                     return movieRepository.save(movie);
                 })
-//                .orElseThrow(MovieNotFoundException)
+                .orElseThrow(() -> new MovieNotFoundException(ExceptionConstants.MOVIE_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
     public void deleteMovieById(Long movieId) {

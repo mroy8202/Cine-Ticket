@@ -2,11 +2,9 @@ package com.mritunjay.cineticket.controller;
 
 import com.mritunjay.cineticket.dto.APIResponseDTO;
 import com.mritunjay.cineticket.dto.PagedAPIResponseDTO;
-import com.mritunjay.cineticket.dto.auth.AuthReponseDTO;
 import com.mritunjay.cineticket.dto.movie.MovieRequestDTO;
 import com.mritunjay.cineticket.model.Movie;
 import com.mritunjay.cineticket.service.MovieService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;

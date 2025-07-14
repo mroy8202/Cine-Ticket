@@ -13,7 +13,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Builder
 @Data
-public class TheatreAdmin {
+public class TheatreVsAdmin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +31,7 @@ public class TheatreAdmin {
     public boolean equals(Object obj) {
         if(this == obj) return true;
         if(obj == null || getClass() != obj.getClass()) return false;
-        TheatreAdmin that = (TheatreAdmin) obj;
+        TheatreVsAdmin that = (TheatreVsAdmin) obj;
         return Objects.equals(id, that.id) &&
                 Objects.equals(theatre, that.theatre) &&
                 Objects.equals(user, that.user);

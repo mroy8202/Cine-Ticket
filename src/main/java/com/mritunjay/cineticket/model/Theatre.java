@@ -30,7 +30,7 @@ public class Theatre {
     private Double totalRevenue;
 
     @OneToMany(mappedBy = "theatre", cascade = CascadeType.ALL)
-    private List<TheatreAdmin> theatreAdmins;
+    private List<TheatreVsAdmin> theatreAdmins;
 
     @OneToMany(mappedBy = "theatre", cascade = CascadeType.ALL)
     List<Show> shows;

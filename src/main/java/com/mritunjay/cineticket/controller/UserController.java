@@ -1,4 +1,4 @@
-package com.mritunjay.cineticket.controller.controllerAdvice;
+package com.mritunjay.cineticket.controller;
 
 import com.mritunjay.cineticket.dto.APIResponseDTO;
 import com.mritunjay.cineticket.dto.PagedAPIResponseDTO;
@@ -24,7 +24,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @Secured({"ROLE_SUPER_ADMIN"})
+    @Secured("{ROLE_SUPER_ADMIN}")
     @GetMapping("/all")
     public ResponseEntity<PagedAPIResponseDTO> getAllUsers(
             @RequestParam int page,
@@ -53,7 +53,7 @@ public class UserController {
 
         UserResponseDTO userResponseDTO = UserResponseDTO.builder()
                 .userId(newUser.getUserId())
-                .userName(newUser.getUserName())
+                .userName(newUser.getUsername())
                 .firstName(newUser.getFirstName())
                 .lastName(newUser.getLastName())
                 .userEmail(newUser.getUserEmail())
@@ -80,7 +80,7 @@ public class UserController {
 
         UserResponseDTO userResponseDTO = UserResponseDTO.builder()
                 .userId(user.getUserId())
-                .userName(user.getUserName())
+                .userName(user.getUsername())
                 .userEmail(user.getUserEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
@@ -109,7 +109,7 @@ public class UserController {
         UserResponseDTO userResponseDTO = UserResponseDTO
                 .builder()
                 .userId(updatedUser.getUserId())
-                .userName(updatedUser.getUserName())
+                .userName(updatedUser.getUsername())
                 .firstName(updatedUser.getFirstName())
                 .lastName(updatedUser.getLastName())
                 .userEmail(updatedUser.getUserEmail())

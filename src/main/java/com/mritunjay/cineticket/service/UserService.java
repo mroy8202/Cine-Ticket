@@ -36,7 +36,7 @@ public class UserService {
         }
 
         User user = User.builder()
-                .userName(userRequestDTO.getUserName())
+                .username(userRequestDTO.getUserName())
                 .password(userRequestDTO.getPassword())
                 .firstName(userRequestDTO.getFirstName())
                 .lastName(userRequestDTO.getLastName())

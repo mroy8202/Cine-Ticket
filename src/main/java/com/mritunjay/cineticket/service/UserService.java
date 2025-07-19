@@ -31,7 +31,7 @@ public class UserService {
     }
 
     public User createNewUser(UserRequestDTO userRequestDTO) {
-        if(userRepository.findByUserNameOrUserEmail(userRequestDTO.getUserName(), userRequestDTO.getUserEmail()).isPresent()) {
+        if(userRepository.findByUsernameOrUserEmail(userRequestDTO.getUserName(), userRequestDTO.getUserEmail()).isPresent()) {
             throw new UserConflictException("User with the same username or email already exists", HttpStatus.CONFLICT);
         }
 
@@ -81,12 +81,12 @@ public class UserService {
 
     public User getUserByUserName(String userName) {
         return userRepository
-                .findByUserName(userName)
+                .findByUsername(userName)
                 .orElseThrow(() -> new UserNotFoundException(ExceptionConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
     public boolean isUserPresentByUserNameOrUserEmail(String userName, String userEmail) {
-        return userRepository.findByUserNameOrUserEmail(userName, userEmail).isPresent();
+        return userRepository.findByUsernameOrUserEmail(userName, userEmail).isPresent();
     }
 
 }

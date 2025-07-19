@@ -45,7 +45,7 @@ public class JWTService {
     public Date getExpiryDateForJWT() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
-        calendar.add(Calendar.MINUTE, 15);
+        calendar.add(Calendar.MINUTE, 600);
         return calendar.getTime();
     }
 

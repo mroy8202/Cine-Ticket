@@ -29,7 +29,7 @@ public class Reservation {
     @JoinColumn(name = "show_id")
     private Show show;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
     List<ShowSeat> seatsReserved;
 
     private LocalDateTime reservationTime;

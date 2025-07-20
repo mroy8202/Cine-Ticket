@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,13 +19,15 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    UserController(UserService userService) {
+    UserController(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userService = userService;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    @Secured("{ROLE_SUPER_ADMIN}")
+    @Secured({"ROLE_SUPER_ADMIN"})
     @GetMapping("/all")
     public ResponseEntity<PagedAPIResponseDTO> getAllUsers(
             @RequestParam int page,
@@ -37,7 +40,7 @@ public class UserController {
                 .body(PagedAPIResponseDTO
                         .builder()
                         .pageData(users.getContent())
-                        .totalElements(users.getTotalElements())
+                        .totalElements(users.getTotalElements()) // total number of users
                         .totalPages(users.getTotalPages())
                         .currentLimit(users.getNumberOfElements())
                         .build()
@@ -49,6 +52,10 @@ public class UserController {
     public ResponseEntity<APIResponseDTO> createNewUser(
             @RequestBody UserRequestDTO userRequestDTO
     ) {
+
+        String encodedPassword = bCryptPasswordEncoder.encode(userRequestDTO.getPassword());
+        userRequestDTO.setPassword(encodedPassword);
+
         User newUser = userService.createNewUser(userRequestDTO);
 
         UserResponseDTO userResponseDTO = UserResponseDTO.builder()

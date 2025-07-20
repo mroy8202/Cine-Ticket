@@ -44,6 +44,7 @@ public class TheatreService {
     }
 
     public Theatre createNewTheatre(TheatreRequestDTO theatreRequestDTO) {
+        // fetch user who has to be promoted to theatre admin
         User theatreAdmin = userService.getUserById(theatreRequestDTO.getTheatreAdminId());
 
         Theatre theatre = Theatre
@@ -54,12 +55,13 @@ public class TheatreService {
                 .totalRevenue(0D)
                 .build();
 
-        List<TheatreVsAdmin> theatreAdmins = new ArrayList<>();
-        TheatreVsAdmin theatreVsAdmin = createTheatreVsAdmin(theatre, theatreAdmin);
-        theatreAdmins.add(theatreVsAdmin);
-        theatre.setTheatreAdmins(theatreAdmins);
 
-        userService.promoteUser(theatreAdmin);
+        List<TheatreVsAdmin> theatreAdmins = new ArrayList<>();
+        TheatreVsAdmin theatreVsAdmin = createTheatreVsAdmin(theatre, theatreAdmin); // mapped theatre admin to theatre
+        theatreAdmins.add(theatreVsAdmin);
+        theatre.setTheatreAdmins(theatreAdmins); // add theatre admin user to theatre
+
+        userService.promoteUser(theatreAdmin); // promote user's role to ROLE_THEATRE_ADMIN
 
         List<Screen> screens = new ArrayList<>();
         for (ScreenRequestDTO screenRequestDTO: theatreRequestDTO.getScreens()) {

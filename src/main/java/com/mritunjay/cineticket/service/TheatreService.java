@@ -44,10 +44,11 @@ public class TheatreService {
     }
 
     public Theatre createNewTheatre(TheatreRequestDTO theatreRequestDTO) {
-        // fetch user who has to be promoted to theatre admin
+        // Step 1: Fetch user who will become theatre admin
         User theatreAdmin = userService.getUserById(theatreRequestDTO.getTheatreAdminId());
 
-        Theatre theatre = Theatre
+        // Step 2: Build the theatre, do not save yet
+        Theatre newTheatre = Theatre
                 .builder()
                 .theatreName(theatreRequestDTO.getTheatreName())
                 .theatreLocation(theatreRequestDTO.getTheatreLocation())
@@ -55,24 +56,24 @@ public class TheatreService {
                 .totalRevenue(0D)
                 .build();
 
+        // Step 3: Assign admin mapping
+        TheatreVsAdmin theatreVsAdmin = createTheatreVsAdmin(newTheatre, theatreAdmin);
+        newTheatre.setTheatreAdmins(List.of(theatreVsAdmin));
 
-        List<TheatreVsAdmin> theatreAdmins = new ArrayList<>();
-        TheatreVsAdmin theatreVsAdmin = createTheatreVsAdmin(theatre, theatreAdmin); // mapped theatre admin to theatre
-        theatreAdmins.add(theatreVsAdmin);
-        theatre.setTheatreAdmins(theatreAdmins); // add theatre admin user to theatre
+        // Promote the user's role
+        userService.promoteUser(theatreAdmin);
 
-        userService.promoteUser(theatreAdmin); // promote user's role to ROLE_THEATRE_ADMIN
-
+        // Step 4: Create Screens and their Seats
         List<Screen> screens = new ArrayList<>();
         for (ScreenRequestDTO screenRequestDTO: theatreRequestDTO.getScreens()) {
-            Screen screen = screenService.createNewScreen(theatre, screenRequestDTO);
+            Screen screen = screenService.createNewScreen(newTheatre, screenRequestDTO);
             screens.add(screen);
         }
-        theatre.setScreens(screens);
-        theatre.setTotalScreens(screens.size());
-        theatre.setTotalBookings(0);
+        newTheatre.setScreens(screens);
+        newTheatre.setTotalScreens(screens.size());
 
-        return theatreRepository.save(theatre);
+        // Step 4: Save theatre (cascades all)
+        return theatreRepository.save(newTheatre);
     }
 
     public Theatre updateTheatreById(Long theatreId, TheatreRequestDTO theatreRequestDTO) {

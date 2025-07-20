@@ -1,5 +1,6 @@
 package com.mritunjay.cineticket.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +19,7 @@ public class TheatreVsAdmin {
 
     @ManyToOne
     @JoinColumn(name = "theatre_id", nullable = false)
+    @JsonBackReference
     private Theatre theatre;
 
     @ManyToOne

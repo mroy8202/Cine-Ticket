@@ -19,16 +19,14 @@ public class SeatService {
     }
 
     public Seat createNewSeat(Screen screen, SeatRequestDTO seatRequestDTO) {
-        Seat seat = Seat
+        return Seat
                 .builder()
                 .rowId(seatRequestDTO.getRowId())
                 .seatNumber(seatRequestDTO.getSeatNumber())
                 .seatPrice(seatRequestDTO.getSeatPrice())
                 .seatType(SeatType.valueOf(seatRequestDTO.getSeatType()))
-                .screen(screen)
+                .screen(screen) // parent reference
                 .build();
-
-        return seatRepository.save(seat);
     }
 
 }

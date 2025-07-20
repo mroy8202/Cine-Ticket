@@ -37,7 +37,7 @@ public class ScreenService {
         Screen screen = Screen
                 .builder()
                 .screenName(screenRequestDTO.getScreenName())
-                .theatre(theatre)
+                .theatre(theatre) // parent reference
                 .build();
 
         List<Seat> seats = new ArrayList<>();
@@ -48,7 +48,8 @@ public class ScreenService {
         }
         screen.setSeats(seats);
 
-        return screenRepository.save(screen);
+        // return screenRepository.save(screen);
+        return screen;
     }
 
 }

@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 @Builder
 public class SeatRequestDTO {
-    Integer rowId;
-    Integer seatNumber;
-    String seatType;
-    Double seatPrice;
+    private Integer rowNumber;
+    private Integer seatNumber;
+    private String seatType;
+    private Double seatPrice;
 }

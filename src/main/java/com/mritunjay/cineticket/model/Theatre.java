@@ -1,6 +1,5 @@
 package com.mritunjay.cineticket.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,14 +27,12 @@ public class Theatre {
     private Double totalRevenue;
 
     @OneToMany(mappedBy = "theatre", cascade = CascadeType.ALL)
-    @JsonManagedReference
     private List<TheatreVsAdmin> theatreAdmins;
 
     @OneToMany(mappedBy = "theatre", cascade = CascadeType.ALL)
     List<Show> shows;
 
     @OneToMany(mappedBy = "theatre", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonManagedReference
     List<Screen> screens;
 
 }

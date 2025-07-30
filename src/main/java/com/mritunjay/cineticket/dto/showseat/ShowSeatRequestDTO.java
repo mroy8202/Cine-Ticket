@@ -1,4 +1,4 @@
-package com.mritunjay.cineticket.dto.showSeat;
+package com.mritunjay.cineticket.dto.showseat;
 
 import lombok.Builder;
 import lombok.Data;
@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @Builder
 public class ShowSeatRequestDTO {
-    Long seatId;
+    private Long seatId;
 }

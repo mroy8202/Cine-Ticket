@@ -1,7 +1,7 @@
 package com.mritunjay.cineticket.filter;
 
 import com.mritunjay.cineticket.model.User;
-import com.mritunjay.cineticket.service.UserService;
+import com.mritunjay.cineticket.service.impl.UserServiceImpl;
 import com.mritunjay.cineticket.service.auth.JWTService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,10 +20,10 @@ import java.io.IOException;
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTService jwtService;
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     @Autowired
-    JWTFilter(JWTService jwtService, UserService userService) {
+    JWTFilter(JWTService jwtService, UserServiceImpl userService) {
         this.jwtService = jwtService;
         this.userService = userService;
     }

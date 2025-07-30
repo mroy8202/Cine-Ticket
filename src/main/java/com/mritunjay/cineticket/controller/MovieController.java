@@ -3,7 +3,8 @@ package com.mritunjay.cineticket.controller;
 import com.mritunjay.cineticket.dto.APIResponseDTO;
 import com.mritunjay.cineticket.dto.PagedAPIResponseDTO;
 import com.mritunjay.cineticket.dto.movie.MovieRequestDTO;
-import com.mritunjay.cineticket.model.Movie;
+import com.mritunjay.cineticket.dto.movie.MovieResponseDTO;
+import com.mritunjay.cineticket.dto.movie.MovieSummaryResponseDTO;
 import com.mritunjay.cineticket.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,10 +26,10 @@ public class MovieController {
 
     @GetMapping("/all")
     public ResponseEntity<PagedAPIResponseDTO> getAllMovies(
-            @RequestParam int page,
-            @RequestParam int pageSize
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize
     ) {
-        Page<Movie> movies = movieService.getAllMovies(page, pageSize);
+        Page<MovieSummaryResponseDTO> movies = movieService.getAllMovies(page, pageSize);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -46,14 +47,14 @@ public class MovieController {
     public ResponseEntity<APIResponseDTO> getMoviesById(
             @PathVariable Long movieId
     ) {
-        Movie movie = movieService.getMovieById(movieId);
+        MovieResponseDTO movie = movieService.getMovieById(movieId);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(APIResponseDTO
                         .builder()
-                        .data(movie).
-                        build()
+                        .data(movie)
+                        .build()
                 );
     }
 
@@ -62,7 +63,7 @@ public class MovieController {
     public ResponseEntity<APIResponseDTO> createNewMovie(
             @RequestBody MovieRequestDTO movieRequestDTO
             ) {
-        Movie newMovie = movieService.createNewMovie(movieRequestDTO);
+        MovieResponseDTO newMovie = movieService.createNewMovie(movieRequestDTO);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -79,7 +80,7 @@ public class MovieController {
                 @PathVariable Long movieId,
                 @RequestBody MovieRequestDTO movieRequestDTO
     ) {
-        Movie updatedMovie = movieService.updateMovieById(movieId, movieRequestDTO);
+        MovieResponseDTO updatedMovie = movieService.updateMovieById(movieId, movieRequestDTO);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -96,7 +97,7 @@ public class MovieController {
     public ResponseEntity<APIResponseDTO> deleteMovieById(
             @PathVariable Long movieId
     ) {
-        Movie deletedMovie = movieService.getMovieById(movieId);
+        MovieResponseDTO deletedMovie = movieService.getMovieById(movieId);
         movieService.deleteMovieById(movieId);
 
         return ResponseEntity

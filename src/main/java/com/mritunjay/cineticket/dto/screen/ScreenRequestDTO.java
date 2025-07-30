@@ -10,5 +10,5 @@ import java.util.List;
 @Builder
 public class ScreenRequestDTO {
     private String screenName;
-    List<SeatRequestDTO> seats;
+    private List<SeatRequestDTO> seats;
 }

@@ -3,8 +3,10 @@ package com.mritunjay.cineticket.controller;
 import com.mritunjay.cineticket.dto.APIResponseDTO;
 import com.mritunjay.cineticket.dto.PagedAPIResponseDTO;
 import com.mritunjay.cineticket.dto.reservation.ReservationRequestDTO;
+import com.mritunjay.cineticket.dto.reservation.ReservationResponseDTO;
 import com.mritunjay.cineticket.model.Reservation;
 import com.mritunjay.cineticket.service.ReservationService;
+import com.mritunjay.cineticket.service.impl.ReservationServiceImpl;
 import com.mritunjay.cineticket.validation.UserRoleValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,7 +35,7 @@ public class ReservationController {
             @RequestParam int page,
             @RequestParam int pageSize
     ) {
-        Page<Reservation> reservations = reservationService.getAllReservationsForUser(userId, page, pageSize);
+        Page<ReservationResponseDTO> reservations = reservationService.getAllReservationsForUser(userId, page, pageSize);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -54,7 +56,7 @@ public class ReservationController {
     ) {
         // need to verify if the current user is trying to create a reservation for another user
 
-        Reservation newReservation = reservationService.createNewReservation(reservationRequestDTO);
+        ReservationResponseDTO newReservation = reservationService.createNewReservation(reservationRequestDTO);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

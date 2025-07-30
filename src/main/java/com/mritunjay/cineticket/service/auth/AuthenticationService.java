@@ -1,9 +1,10 @@
 package com.mritunjay.cineticket.service.auth;
 
 import com.mritunjay.cineticket.dto.user.UserRequestDTO;
+import com.mritunjay.cineticket.dto.user.UserResponseDTO;
 import com.mritunjay.cineticket.exception.UserConflictException;
 import com.mritunjay.cineticket.model.User;
-import com.mritunjay.cineticket.service.UserService;
+import com.mritunjay.cineticket.service.impl.UserServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -11,25 +12,33 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthenticationService {
 
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JWTService jwtService;
+    private final UserMapper userMapper;
 
-    AuthenticationService(UserService userService, JWTService jwtService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    AuthenticationService(UserServiceImpl userService, JWTService jwtService, BCryptPasswordEncoder bCryptPasswordEncoder, UserMapper userMapper) {
         this.userService = userService;
         this.jwtService = jwtService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.userMapper = userMapper;
     }
 
+
+    // review this method
     public String singUpUser(UserRequestDTO userRequestDTO) {
-        if(userService.isUserPresentByUserNameOrUserEmail(userRequestDTO.getUserName(), userRequestDTO.getUserEmail())) {
+        if(userService.isUserPresentByUserNameOrUserEmail(userRequestDTO.getUsername(), userRequestDTO.getUserEmail())) {
             throw new UserConflictException("User with the same username or email already exists", HttpStatus.CONFLICT);
         }
 
         encodePassword(userRequestDTO);
-        User newUser = userService.createNewUser(userRequestDTO);
+//        User newUser = userService.createNewUser(userRequestDTO);
 
-        return jwtService.generateJWTToken(newUser);
+        UserResponseDTO newUser = userService.createNewUser(userRequestDTO);
+
+//        User thisIsUser = userMapper.convertUserResponseDtoToUserEntity(newUser);
+
+        return jwtService.generateJWTToken(thisIsUser);
     }
 
     public void encodePassword(UserRequestDTO userRequestDTO) {

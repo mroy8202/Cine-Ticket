@@ -1,6 +1,6 @@
 package com.mritunjay.cineticket.dto.reservation;
 
-import com.mritunjay.cineticket.dto.showSeat.ShowSeatRequestDTO;
+import com.mritunjay.cineticket.dto.showseat.ShowSeatRequestDTO;
 import lombok.Builder;
 import lombok.Data;
 

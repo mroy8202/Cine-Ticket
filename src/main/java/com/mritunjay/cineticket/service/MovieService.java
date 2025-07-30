@@ -1,67 +1,25 @@
 package com.mritunjay.cineticket.service;
 
-import com.mritunjay.cineticket.constants.ExceptionConstants;
 import com.mritunjay.cineticket.dto.movie.MovieRequestDTO;
-import com.mritunjay.cineticket.enums.Genre;
-import com.mritunjay.cineticket.exception.MovieNotFoundException;
-import com.mritunjay.cineticket.model.Movie;
-import com.mritunjay.cineticket.repository.MovieRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.mritunjay.cineticket.dto.movie.MovieResponseDTO;
+import com.mritunjay.cineticket.dto.movie.MovieSummaryResponseDTO;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
 
-@Service
-public class MovieService {
+public interface MovieService {
 
-    private final MovieRepository movieRepository;
+    // Get All Movies
+    Page<MovieSummaryResponseDTO> getAllMovies(int page, int pageSize);
 
-    @Autowired
-    MovieService(MovieRepository movieRepository) {
-        this.movieRepository = movieRepository;
-    }
+    // Get Movie By id
+    MovieResponseDTO getMovieById(Long movieId);
 
-    public Page<Movie> getAllMovies(int page, int pageSize) {
-        return movieRepository.findAll(PageRequest.of(page, pageSize));
-    }
+    // Create New Movie
+    MovieResponseDTO createNewMovie(MovieRequestDTO movieRequestDTO);
 
-    public Movie getMovieById(Long movieId) {
-        return movieRepository.findById(movieId)
-                .orElseThrow(() -> new MovieNotFoundException(ExceptionConstants.MOVIE_NOT_FOUND, HttpStatus.NOT_FOUND));
-    }
+    // Update Movie
+    MovieResponseDTO updateMovieById(Long movieId, MovieRequestDTO movieRequestDTO);
 
-    public Movie createNewMovie(MovieRequestDTO movieRequestDTO) {
-        Movie movie = Movie
-                .builder()
-                .movieName(movieRequestDTO.getMovieName())
-                .movieDescription(movieRequestDTO.getMovieDescription())
-                .movieDirector(movieRequestDTO.getMovieDirector())
-                .movieGenre(Genre.valueOf(movieRequestDTO.getMovieGenre()))
-                .movieReleaseDate(movieRequestDTO.getMovieReleaseDate())
-                .movieDuration(movieRequestDTO.getMovieDuration())
-                .totalBookings(0)
-                .build();
+    // Delete Movie By id
+    void deleteMovieById(Long movieId);
 
-        return movieRepository.save(movie);
-    }
-
-    public Movie updateMovieById(Long movieId, MovieRequestDTO movieRequestDTO) {
-        return movieRepository
-                .findById(movieId)
-                .map(movie -> {
-                    movie.setMovieName(movieRequestDTO.getMovieName());
-                    movie.setMovieDescription(movieRequestDTO.getMovieDescription());
-                    movie.setMovieDirector(movieRequestDTO.getMovieDirector());
-                    movie.setMovieGenre(Genre.valueOf(movieRequestDTO.getMovieGenre()));
-                    movie.setMovieReleaseDate(movieRequestDTO.getMovieReleaseDate());
-                    movie.setMovieDuration(movieRequestDTO.getMovieDuration());
-                    return movieRepository.save(movie);
-                })
-                .orElseThrow(() -> new MovieNotFoundException(ExceptionConstants.MOVIE_NOT_FOUND, HttpStatus.NOT_FOUND));
-    }
-
-    public void deleteMovieById(Long movieId) {
-        movieRepository.deleteById(movieId);
-    }
 }

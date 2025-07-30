@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class TheatreAdminRequestDTO {
-    Long userId;
-    Long theatreId;
+    private Long userId;
+    private Long theatreId;
 }

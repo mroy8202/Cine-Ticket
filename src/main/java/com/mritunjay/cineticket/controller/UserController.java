@@ -4,7 +4,6 @@ import com.mritunjay.cineticket.dto.APIResponseDTO;
 import com.mritunjay.cineticket.dto.PagedAPIResponseDTO;
 import com.mritunjay.cineticket.dto.user.UserRequestDTO;
 import com.mritunjay.cineticket.dto.user.UserResponseDTO;
-import com.mritunjay.cineticket.model.User;
 import com.mritunjay.cineticket.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,10 +29,10 @@ public class UserController {
     @Secured({"ROLE_SUPER_ADMIN"})
     @GetMapping("/all")
     public ResponseEntity<PagedAPIResponseDTO> getAllUsers(
-            @RequestParam int page,
-            @RequestParam int pageSize
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize
     ) {
-        Page<User> users = userService.getAllUsers(page, pageSize);
+        Page<UserResponseDTO> users = userService.getAllUsers(page, pageSize);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -56,24 +55,13 @@ public class UserController {
         String encodedPassword = bCryptPasswordEncoder.encode(userRequestDTO.getPassword());
         userRequestDTO.setPassword(encodedPassword);
 
-        User newUser = userService.createNewUser(userRequestDTO);
-
-        UserResponseDTO userResponseDTO = UserResponseDTO.builder()
-                .userId(newUser.getUserId())
-                .userName(newUser.getUsername())
-                .firstName(newUser.getFirstName())
-                .lastName(newUser.getLastName())
-                .userEmail(newUser.getUserEmail())
-                .userStatus(newUser.getUserStatus())
-                .userCreatedAt(newUser.getUserCreatedAt())
-                .userUpdatedAt(newUser.getUserUpdatedAt())
-                .build();
-
+        UserResponseDTO newUser = userService.createNewUser(userRequestDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(APIResponseDTO.builder()
                         .message("New user created with id: " + newUser.getUserId() + " and email: " + newUser.getUserEmail())
-                        .data(userResponseDTO)
+                        .data(newUser)
+                        .data(newUser)
                         .build()
                 );
     }
@@ -83,24 +71,13 @@ public class UserController {
     public ResponseEntity<APIResponseDTO> getUserById(
             @PathVariable Long userId
     ) {
-        User user = userService.getUserById(userId);
-
-        UserResponseDTO userResponseDTO = UserResponseDTO.builder()
-                .userId(user.getUserId())
-                .userName(user.getUsername())
-                .userEmail(user.getUserEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .userStatus(user.getUserStatus())
-                .userCreatedAt(user.getUserCreatedAt())
-                .userUpdatedAt(user.getUserUpdatedAt())
-                .build();
+        UserResponseDTO user = userService.getUserById(userId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(APIResponseDTO
                         .builder()
-                        .data(userResponseDTO)
+                        .data(user)
                         .build()
                 );
     }
@@ -111,26 +88,14 @@ public class UserController {
             @PathVariable Long userId,
             @RequestBody UserRequestDTO userRequestDTO
     ) {
-        User updatedUser = userService.updateUserById(userId, userRequestDTO);
-
-        UserResponseDTO userResponseDTO = UserResponseDTO
-                .builder()
-                .userId(updatedUser.getUserId())
-                .userName(updatedUser.getUsername())
-                .firstName(updatedUser.getFirstName())
-                .lastName(updatedUser.getLastName())
-                .userEmail(updatedUser.getUserEmail())
-                .userStatus(updatedUser.getUserStatus())
-                .userCreatedAt(updatedUser.getUserCreatedAt())
-                .userUpdatedAt(updatedUser.getUserUpdatedAt())
-                .build();
+        UserResponseDTO updatedUser = userService.updateUserById(userId, userRequestDTO);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(APIResponseDTO
                         .builder()
                         .message("Updated the user with id: " + updatedUser.getUserId() + " and email: " + updatedUser.getUserEmail())
-                        .data(userResponseDTO)
+                        .data(updatedUser)
                         .build()
                 );
     }
@@ -140,7 +105,7 @@ public class UserController {
     public ResponseEntity<APIResponseDTO> deleteUserById(
             @PathVariable Long userId
     ) {
-        User deletedUser = userService.getUserById(userId);
+        UserResponseDTO deletedUser = userService.getUserById(userId);
         userService.deleteUserById(userId);
 
         return ResponseEntity

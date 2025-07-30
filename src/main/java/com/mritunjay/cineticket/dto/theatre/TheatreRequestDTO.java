@@ -1,6 +1,7 @@
 package com.mritunjay.cineticket.dto.theatre;
 
 import com.mritunjay.cineticket.dto.screen.ScreenRequestDTO;
+import com.mritunjay.cineticket.model.Theatre;
 import lombok.Builder;
 import lombok.Data;
 
@@ -12,5 +13,5 @@ public class TheatreRequestDTO {
     private String theatreName;
     private String theatreLocation;
     private Long theatreAdminId;
-    List<ScreenRequestDTO> screens;
+    private List<ScreenRequestDTO> screens;
 }

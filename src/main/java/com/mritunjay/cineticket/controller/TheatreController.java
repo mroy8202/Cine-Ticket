@@ -2,11 +2,12 @@ package com.mritunjay.cineticket.controller;
 
 import com.mritunjay.cineticket.dto.APIResponseDTO;
 import com.mritunjay.cineticket.dto.PagedAPIResponseDTO;
-import com.mritunjay.cineticket.dto.theatre.TheatreRequestDTO;
+import com.mritunjay.cineticket.dto.theatre.*;
 import com.mritunjay.cineticket.dto.user.TheatreAdminRequestDTO;
 import com.mritunjay.cineticket.model.Theatre;
 import com.mritunjay.cineticket.model.User;
 import com.mritunjay.cineticket.service.TheatreService;
+import com.mritunjay.cineticket.service.impl.TheatreServiceImpl;
 import com.mritunjay.cineticket.service.UserService;
 import com.mritunjay.cineticket.validation.UserRoleValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +23,11 @@ import org.springframework.web.bind.annotation.*;
 public class TheatreController {
 
     private final TheatreService theatreService;
-    private final UserService userService;
     private final UserRoleValidationService userRoleValidationService;
 
     @Autowired
-    public TheatreController(TheatreService theatreService, UserService userService, UserRoleValidationService userRoleValidationService) {
+    public TheatreController(TheatreService theatreService, UserRoleValidationService userRoleValidationService) {
         this.theatreService = theatreService;
-        this.userService = userService;
         this.userRoleValidationService = userRoleValidationService;
     }
 
@@ -37,7 +36,7 @@ public class TheatreController {
             @RequestParam int page,
             @RequestParam int pageSize
     ) {
-        Page<Theatre> theatres = theatreService.getAllTheatres(page, pageSize);
+        Page<TheatreSummaryResponseDTO> theatres = theatreService.getAllTheatres(page, pageSize);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -55,7 +54,7 @@ public class TheatreController {
     public ResponseEntity<APIResponseDTO> getTheatreById(
             @PathVariable Long theatreId
     ) {
-        Theatre theatre = theatreService.getTheatreById(theatreId);
+        TheatreResponseDTO theatre = theatreService.getTheatreById(theatreId);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -71,7 +70,7 @@ public class TheatreController {
     public ResponseEntity<APIResponseDTO> createNewTheatre(
             @RequestBody TheatreRequestDTO theatreRequestDTO
     ) {
-        Theatre newTheatre = theatreService.createNewTheatre(theatreRequestDTO);
+        TheatreDetailedResponseDTO newTheatre = theatreService.createNewTheatre(theatreRequestDTO);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -89,7 +88,7 @@ public class TheatreController {
             @PathVariable Long theatreId,
             @RequestBody TheatreRequestDTO theatreRequestDTO
     ) {
-        Theatre updatedTheatre = theatreService.updateTheatreById(theatreId, theatreRequestDTO);
+        TheatreDetailedResponseDTO updatedTheatre = theatreService.updateTheatreById(theatreId, theatreRequestDTO);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -106,7 +105,7 @@ public class TheatreController {
     public ResponseEntity<APIResponseDTO> deleteTheatreById(
             @PathVariable Long userId
     ) {
-        Theatre deletedTheatre = theatreService.getTheatreById(userId);
+        TheatreResponseDTO deletedTheatre = theatreService.getTheatreById(userId);
         theatreService.deleteTheatreById(userId);
 
         return ResponseEntity
@@ -123,7 +122,7 @@ public class TheatreController {
     public ResponseEntity<APIResponseDTO> addTheatreAdmin(
             @RequestBody TheatreAdminRequestDTO theatreAdminRequestDTO
     ) {
-        Theatre theatre = theatreService.addTheatreAdmin(theatreAdminRequestDTO);
+        TheatreAdminResponseDTO theatre = theatreService.addTheatreAdmin(theatreAdminRequestDTO);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -139,8 +138,7 @@ public class TheatreController {
     public ResponseEntity<APIResponseDTO> removeTheatreAdmin(
             @RequestBody TheatreAdminRequestDTO theatreAdminRequestDTO
     ) {
-        User user = userService.getUserById(theatreAdminRequestDTO.getUserId());
-        Theatre theatre = theatreService.removeTheatreAdmin(theatreAdminRequestDTO);
+        TheatreAdminResponseDTO theatre = theatreService.removeTheatreAdmin(theatreAdminRequestDTO);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

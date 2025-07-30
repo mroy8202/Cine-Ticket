@@ -1,6 +1,5 @@
 package com.mritunjay.cineticket.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.mritunjay.cineticket.enums.SeatType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 @Table(uniqueConstraints = {
-        @UniqueConstraint(name = "row_seat_id", columnNames = {"screen_id", "rowId", "seatNumber"})
+        @UniqueConstraint(name = "row_seat_id", columnNames = {"screen_id", "rowNumber", "seatNumber"})
 })
 public class Seat {
 
@@ -22,7 +21,7 @@ public class Seat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long seatId;
 
-    private Integer rowId;
+    private Integer rowNumber;
 
     private Integer seatNumber;
 
@@ -31,7 +30,6 @@ public class Seat {
 
     @ManyToOne
     @JoinColumn(name = "screen_id")
-    @JsonBackReference
     private Screen screen;
 
     private Double seatPrice;

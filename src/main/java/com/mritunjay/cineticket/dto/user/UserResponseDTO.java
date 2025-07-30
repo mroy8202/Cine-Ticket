@@ -1,6 +1,5 @@
 package com.mritunjay.cineticket.dto.user;
 
-import com.mritunjay.cineticket.enums.UserStatus;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,11 +9,12 @@ import java.time.LocalDateTime;
 @Builder
 public class UserResponseDTO {
     private Long userId;
-    private String userName;
+    private String username;
     private String firstName;
     private String lastName;
     private String userEmail;
-    private UserStatus userStatus;
+    private String userStatus; // enum -> String
     private LocalDateTime userCreatedAt;
     private LocalDateTime userUpdatedAt;
+    private String userRole; // // enum -> String
 }

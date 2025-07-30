@@ -1,6 +1,7 @@
 package com.mritunjay.cineticket.validation;
 
 import com.mritunjay.cineticket.enums.UserRole;
+import com.mritunjay.cineticket.mapper.theatre.TheatreMapper;
 import com.mritunjay.cineticket.model.Reservation;
 import com.mritunjay.cineticket.model.Theatre;
 import com.mritunjay.cineticket.model.TheatreVsAdmin;
@@ -20,12 +21,15 @@ public class UserRoleValidationService {
     private final ShowService showService;
     private final ReservationService reservationService;
 
-    public UserRoleValidationService(UserService userService, TheatreService theatreService, ScreenService screenService, ShowService showService, ReservationService reservationService) {
+    private final TheatreMapper theatreMapper;
+
+    public UserRoleValidationService(UserService userService, TheatreService theatreService, ScreenService screenService, ShowService showService, ReservationService reservationService, TheatreMapper theatreMapper) {
         this.userService = userService;
         this.theatreService = theatreService;
         this.screenService = screenService;
         this.showService = showService;
         this.reservationService = reservationService;
+        this.theatreMapper = theatreMapper;
     }
 
     public boolean isSuperAdmin() {
@@ -57,7 +61,10 @@ public class UserRoleValidationService {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String currentUsername = authentication.getName();
             User user = userService.getUserByUserName(currentUsername);
-            Theatre theatre = theatreService.getTheatreById(theatreId);
+            Theatre theatre = theatreMapper.convertTheatreResponseDtoToTheatreEntity(
+                    theatreService.getTheatreById(theatreId)
+            );
+
 
             for (TheatreVsAdmin theatreAdmin : theatre.getTheatreAdmins()) {
                 if(theatreAdmin.getUser().getUserId().equals(user.getUserId())) {
@@ -74,7 +81,9 @@ public class UserRoleValidationService {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String currentUsername = authentication.getName();
             User user = userService.getUserByUserName(currentUsername);
-            Theatre theatre = showService.getShowById(showId).getTheatre();
+            Theatre theatre = theatreMapper.convertTheatreSummaryResponseDtoToTheatreEntity(
+                    showService.getShowById(showId).getTheatre()
+            );
 
             for (TheatreVsAdmin theatreAdmin : theatre.getTheatreAdmins()) {
                 if(theatreAdmin.getUser().getUserId().equals(user.getUserId())) {
@@ -93,8 +102,8 @@ public class UserRoleValidationService {
             User user = userService.getUserByUserName(currentUsername);
             Theatre theatre = screenService.getScreenById(screenId).getTheatre();
 
-            for (TheatreVsAdmin thetreAdmin : theatre.getTheatreAdmins()) {
-                if(thetreAdmin.getUser().getUserId().equals(user.getUserId())) {
+            for (TheatreVsAdmin theatreAdmin : theatre.getTheatreAdmins()) {
+                if(theatreAdmin.getUser().getUserId().equals(user.getUserId())) {
                     return true;
                 }
             }

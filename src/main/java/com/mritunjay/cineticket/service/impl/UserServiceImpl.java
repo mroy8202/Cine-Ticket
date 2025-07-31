@@ -100,12 +100,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void demoteUser(User user) {
+        user.setUserRole(UserRole.ROLE_USER);
+        userRepository.save(user);
+    }
+
+    @Override
     public User getUserByUserName(String userName) {
         return userRepository
                 .findByUsername(userName)
                 .orElseThrow(() -> new UserNotFoundException(ExceptionConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
+    @Override
     public boolean isUserPresentByUserNameOrUserEmail(String userName, String userEmail) {
         return userRepository.findByUsernameOrUserEmail(userName, userEmail).isPresent();
     }

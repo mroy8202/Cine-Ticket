@@ -82,13 +82,13 @@ public class TheatreController {
                 );
     }
 
-    @PreAuthorize("@userRoleValidationService.isUserHavePermissionToPerformWriteOperationForTheatre(#theatreId)")
+    @PreAuthorize("@userRoleValidationService.doesUserHavePermissionToPerformWriteOperationForTheatre(#theatreId)")
     @PutMapping("/theatre/{theatreId}")
     public ResponseEntity<APIResponseDTO> updateTheatreById(
             @PathVariable Long theatreId,
-            @RequestBody TheatreRequestDTO theatreRequestDTO
+            @RequestBody TheatreUpdateRequestDTO theatreUpdateRequestDTO
     ) {
-        TheatreDetailedResponseDTO updatedTheatre = theatreService.updateTheatreById(theatreId, theatreRequestDTO);
+        TheatreDetailedResponseDTO updatedTheatre = theatreService.updateTheatreById(theatreId, theatreUpdateRequestDTO);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -100,13 +100,13 @@ public class TheatreController {
                 );
     }
 
-    @PreAuthorize("@userRoleValidationService.isUserHavePermissionToPerformWriteOperationForTheatre(#theatreId)")
+    @PreAuthorize("@userRoleValidationService.doesUserHavePermissionToPerformWriteOperationForTheatre(#theatreId)")
     @DeleteMapping("/theatre/{theatreId}")
     public ResponseEntity<APIResponseDTO> deleteTheatreById(
-            @PathVariable Long userId
+            @PathVariable Long theatreId
     ) {
-        TheatreResponseDTO deletedTheatre = theatreService.getTheatreById(userId);
-        theatreService.deleteTheatreById(userId);
+        TheatreResponseDTO deletedTheatre = theatreService.getTheatreById(theatreId);
+        theatreService.deleteTheatreById(theatreId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -117,7 +117,7 @@ public class TheatreController {
                 );
     }
 
-    @PreAuthorize("@userRoleValidationService.isUserHavePermissionToPerformWriteOperationForTheatre(#theatreAdminRequestDTO.theatreId)")
+    @PreAuthorize("@userRoleValidationService.doesUserHavePermissionToPerformWriteOperationForTheatre(#theatreAdminRequestDTO.theatreId)")
     @PostMapping("/theatre/admin")
     public ResponseEntity<APIResponseDTO> addTheatreAdmin(
             @RequestBody TheatreAdminRequestDTO theatreAdminRequestDTO
@@ -133,7 +133,7 @@ public class TheatreController {
                 );
     }
 
-    @PreAuthorize("@userRoleValidationService.isUserHavePermissionToPerformWriteOperationForTheatre(#theatreAdminRequestDTO.theatreId)")
+    @PreAuthorize("@userRoleValidationService.doesUserHavePermissionToPerformWriteOperationForTheatre(#theatreAdminRequestDTO.theatreId)")
     @DeleteMapping("/theatre/admin")
     public ResponseEntity<APIResponseDTO> removeTheatreAdmin(
             @RequestBody TheatreAdminRequestDTO theatreAdminRequestDTO

@@ -68,7 +68,7 @@ public class ReservationController {
                 );
     }
 
-    @PreAuthorize("@userRoleValidationService.isUserHavePermissionToCancelReservation(#reservationId)")
+    @PreAuthorize("@userRoleValidationService.doesUserHavePermissionToCancelReservation(#reservationId)")
     @PutMapping("/cancel/{reservationId}")
     public ResponseEntity<APIResponseDTO> cancelReservation(
             @PathVariable Long reservationId

@@ -4,13 +4,14 @@ import com.mritunjay.cineticket.constants.ExceptionConstants;
 import com.mritunjay.cineticket.dto.theatre.*;
 import com.mritunjay.cineticket.dto.user.TheatreAdminRequestDTO;
 import com.mritunjay.cineticket.exception.TheatreNotFoundException;
+import com.mritunjay.cineticket.exception.UserNotFoundException;
 import com.mritunjay.cineticket.mapper.theatre.TheatreMapper;
-import com.mritunjay.cineticket.mapper.user.UserMapper;
 import com.mritunjay.cineticket.model.Screen;
 import com.mritunjay.cineticket.model.Theatre;
 import com.mritunjay.cineticket.model.TheatreVsAdmin;
 import com.mritunjay.cineticket.model.User;
 import com.mritunjay.cineticket.repository.TheatreRepository;
+import com.mritunjay.cineticket.repository.UserRepository;
 import com.mritunjay.cineticket.service.ScreenService;
 import com.mritunjay.cineticket.service.TheatreService;
 import com.mritunjay.cineticket.service.UserService;
@@ -26,22 +27,22 @@ import java.util.List;
 public class TheatreServiceImpl implements TheatreService {
 
     private final TheatreRepository theatreRepository;
+    private final UserRepository userRepository;
     private final UserService userService;
     private final ScreenService screenService;
 
     private final TheatreMapper theatreMapper;
-    private final UserMapper userMapper;
 
     @Autowired
-    TheatreServiceImpl(TheatreRepository theatreRepository, UserService userService, ScreenService screenService, TheatreMapper theatreMapper, UserMapper userMapper) {
+    TheatreServiceImpl(TheatreRepository theatreRepository,UserRepository userRepository, UserService userService, ScreenService screenService, TheatreMapper theatreMapper) {
         this.theatreRepository = theatreRepository;
+        this.userRepository = userRepository;
         this.userService = userService;
         this.screenService = screenService;
         this.theatreMapper = theatreMapper;
-        this.userMapper = userMapper;
     }
 
-    @Autowired
+    @Override
     public Page<TheatreSummaryResponseDTO> getAllTheatres(int page, int pageSize) {
         Page<Theatre> theatres = theatreRepository.findAll(PageRequest.of(page, pageSize));
         return theatres.map(theatreMapper::convertTheatreEntityToTheatreSummaryResponseDto);
@@ -58,9 +59,8 @@ public class TheatreServiceImpl implements TheatreService {
     @Override
     public TheatreDetailedResponseDTO createNewTheatre(TheatreRequestDTO theatreRequestDTO) {
         // Step 1: Fetch user who will become theatre admin
-        User theatreAdmin = userMapper.convertUserResponseDtoToUserEntity(
-                userService.getUserById(theatreRequestDTO.getTheatreAdminId())
-        );
+        User theatreAdmin = userRepository.findById(theatreRequestDTO.getTheatreAdminId())
+                .orElseThrow(() -> new UserNotFoundException(ExceptionConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         // Step 2: Build the theatre, do not save yet
         Theatre newTheatre = Theatre
@@ -83,7 +83,6 @@ public class TheatreServiceImpl implements TheatreService {
                 .map(screenRequestDTO -> screenService.createNewScreen(newTheatre, screenRequestDTO))
                 .toList();
 
-
         newTheatre.setScreens(screens);
         newTheatre.setTotalScreens(screens.size());
 
@@ -94,12 +93,12 @@ public class TheatreServiceImpl implements TheatreService {
     }
 
     @Override
-    public TheatreDetailedResponseDTO updateTheatreById(Long theatreId, TheatreRequestDTO theatreRequestDTO) {
+    public TheatreDetailedResponseDTO updateTheatreById(Long theatreId, TheatreUpdateRequestDTO theatreUpdateRequestDTO) {
         Theatre updatedTheatre = theatreRepository
                 .findById(theatreId)
                 .map(theatre -> {
-                    theatre.setTheatreName(theatreRequestDTO.getTheatreName());
-                    theatre.setTheatreLocation(theatreRequestDTO.getTheatreLocation());
+                    theatreUpdateRequestDTO.getTheatreName().ifPresent(theatre::setTheatreName);
+                    theatreUpdateRequestDTO.getTheatreLocation().ifPresent(theatre::setTheatreLocation);
                     return theatreRepository.save(theatre);
                 })
                 .orElseThrow(() -> new TheatreNotFoundException(ExceptionConstants.THEATRE_NOT_FOUND, HttpStatus.NOT_FOUND));
@@ -114,9 +113,8 @@ public class TheatreServiceImpl implements TheatreService {
 
     @Override
     public TheatreAdminResponseDTO addTheatreAdmin(TheatreAdminRequestDTO theatreAdminRequestDTO) {
-        User theatreAdmin = userMapper.convertUserResponseDtoToUserEntity(
-                userService.getUserById(theatreAdminRequestDTO.getUserId())
-        );
+        User theatreAdmin = userRepository.findById(theatreAdminRequestDTO.getUserId())
+                .orElseThrow(() -> new UserNotFoundException(ExceptionConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         Theatre fetchedTheatre = theatreRepository
                 .findById(theatreAdminRequestDTO.getTheatreId())
@@ -136,9 +134,9 @@ public class TheatreServiceImpl implements TheatreService {
 
     @Override
     public TheatreAdminResponseDTO removeTheatreAdmin(TheatreAdminRequestDTO theatreAdminRequestDTO) {
-        User theatreAdmin = userMapper.convertUserResponseDtoToUserEntity(
-                userService.getUserById(theatreAdminRequestDTO.getUserId())
-        );
+        User theatreAdmin = userRepository.findById(theatreAdminRequestDTO.getUserId())
+                .orElseThrow(() -> new UserNotFoundException(ExceptionConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+        userService.demoteUser(theatreAdmin);
 
         Theatre fetchedTheatre = theatreRepository
                 .findById(theatreAdminRequestDTO.getTheatreId())

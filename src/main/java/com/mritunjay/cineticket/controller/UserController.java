@@ -88,6 +88,11 @@ public class UserController {
             @PathVariable Long userId,
             @RequestBody UserRequestDTO userRequestDTO
     ) {
+        if(userRequestDTO.getPassword() != null) {
+            String encodedPassword = bCryptPasswordEncoder.encode(userRequestDTO.getPassword());
+            userRequestDTO.setPassword(encodedPassword);
+        }
+
         UserResponseDTO updatedUser = userService.updateUserById(userId, userRequestDTO);
 
         return ResponseEntity

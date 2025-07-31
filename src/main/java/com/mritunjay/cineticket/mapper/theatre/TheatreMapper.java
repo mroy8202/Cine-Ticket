@@ -10,7 +10,6 @@ import com.mritunjay.cineticket.dto.user.UserSummaryResponseDTO;
 import com.mritunjay.cineticket.mapper.screen.ScreenMapper;
 import com.mritunjay.cineticket.mapper.show.ShowMapper;
 import com.mritunjay.cineticket.mapper.user.UserMapper;
-import com.mritunjay.cineticket.model.Show;
 import com.mritunjay.cineticket.model.Theatre;
 import com.mritunjay.cineticket.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,31 +95,6 @@ public class TheatreMapper {
                 .theatreId(theatre.getTheatreId())
                 .theatreName(theatre.getTheatreName())
                 .theatreAdmins(adminDtos)
-                .build();
-    }
-
-    // Theatre Summary Response Dto -> Theatre Entity
-    public Theatre convertTheatreSummaryResponseDtoToTheatreEntity(TheatreSummaryResponseDTO theatreSummaryResponseDTO) {
-        return Theatre.builder()
-                .theatreId(theatreSummaryResponseDTO.getTheatreId())
-                .theatreName(theatreSummaryResponseDTO.getTheatreName())
-                .theatreLocation(theatreSummaryResponseDTO.getTheatreLocation())
-                .build();
-    }
-
-    // Theatre Response Dto -> Theatre Entity
-    public Theatre convertTheatreResponseDtoToTheatreEntity(TheatreResponseDTO theatreResponseDTO) {
-
-        List<Show> shows = theatreResponseDTO.getShows().stream()
-                .map(showMapper::convertShowSummaryResponseDtoToShowEntity)
-                .toList();
-
-        return Theatre.builder()
-                .theatreId(theatreResponseDTO.getTheatreId())
-                .theatreName(theatreResponseDTO.getTheatreName())
-                .theatreLocation(theatreResponseDTO.getTheatreLocation())
-                .totalScreens(theatreResponseDTO.getTotalScreens())
-                .shows(shows)
                 .build();
     }
 

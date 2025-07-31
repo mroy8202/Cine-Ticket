@@ -5,7 +5,6 @@ import com.mritunjay.cineticket.dto.movie.MovieResponseDTO;
 import com.mritunjay.cineticket.dto.movie.MovieSummaryResponseDTO;
 import com.mritunjay.cineticket.enums.Genre;
 import com.mritunjay.cineticket.model.Movie;
-import lombok.Value;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -42,19 +41,6 @@ public class MovieMapper {
                 .movieId(movie.getMovieId())
                 .movieName(movie.getMovieName())
                 .movieGenre(movie.getMovieGenre().toString())
-                .build();
-    }
-
-    // Movie Response Dto -> Movie Entity
-    public Movie convertMovieResponseDtoToMovieEntity(MovieResponseDTO movieResponseDTO) {
-        return Movie.builder()
-                .movieId(movieResponseDTO.getMovieId())
-                .movieName(movieResponseDTO.getMovieName())
-                .movieGenre(Genre.valueOf(movieResponseDTO.getMovieGenre()))
-                .movieDescription(movieResponseDTO.getMovieDescription())
-                .movieDirector(movieResponseDTO.getMovieDirector())
-                .movieReleaseDate(movieResponseDTO.getMovieReleaseDate())
-                .movieDuration(movieResponseDTO.getMovieDuration())
                 .build();
     }
 

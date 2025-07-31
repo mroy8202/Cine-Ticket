@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SeatMapper {
 
-    // Convert Seat Entity to Seat Response Dto
+    // Seat Entity -> Seat Response Dto
     public SeatResponseDTO convertSeatEntityToSeatResponseDto(Seat seat) {
         return SeatResponseDTO.builder()
                 .seatId(seat.getSeatId())

@@ -5,14 +5,12 @@ import com.mritunjay.cineticket.dto.reservation.ReservationRequestDTO;
 import com.mritunjay.cineticket.dto.reservation.ReservationResponseDTO;
 import com.mritunjay.cineticket.dto.showseat.ShowSeatRequestDTO;
 import com.mritunjay.cineticket.enums.ReservationStatus;
-import com.mritunjay.cineticket.exception.AvailableShowSeatsNotFoundException;
-import com.mritunjay.cineticket.exception.ReservationNotCancellableException;
-import com.mritunjay.cineticket.exception.ReservationNotFoundException;
+import com.mritunjay.cineticket.exception.*;
 import com.mritunjay.cineticket.mapper.reservation.ReservationMapper;
-import com.mritunjay.cineticket.mapper.show.ShowMapper;
-import com.mritunjay.cineticket.mapper.user.UserMapper;
 import com.mritunjay.cineticket.model.*;
 import com.mritunjay.cineticket.repository.ReservationRepository;
+import com.mritunjay.cineticket.repository.ShowRepository;
+import com.mritunjay.cineticket.repository.UserRepository;
 import com.mritunjay.cineticket.service.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,24 +27,20 @@ import static com.mritunjay.cineticket.constants.ExceptionConstants.RESERVATION_
 public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepository reservationRepository;
-    private final UserService userService;
-    private final ShowService showService;
+    private final UserRepository userRepository;
+    private final ShowRepository showRepository;
     private final TheatreService theatreService;
     private final ShowSeatService showSeatService;
 
     private final ReservationMapper reservationMapper;
-    private final UserMapper userMapper;
-    private final ShowMapper showMapper;
 
-    public ReservationServiceImpl(ReservationRepository reservationRepository, UserService userService, ShowService showService, TheatreService theatreService, ShowSeatService showSeatService,ReservationMapper reservationMapper, UserMapper userMapper, ShowMapper showMapper) {
+    public ReservationServiceImpl(ReservationRepository reservationRepository, UserRepository userRepository, ShowRepository showRepository, TheatreService theatreService, ShowSeatService showSeatService,ReservationMapper reservationMapper) {
         this.reservationRepository = reservationRepository;
-        this.userService = userService;
-        this.showService = showService;
+        this.userRepository = userRepository;
+        this.showRepository = showRepository;
         this.theatreService = theatreService;
         this.showSeatService = showSeatService;
         this.reservationMapper = reservationMapper;
-        this.userMapper = userMapper;
-        this.showMapper = showMapper;
     }
 
     @Override
@@ -75,12 +69,12 @@ public class ReservationServiceImpl implements ReservationService {
             throw new AvailableShowSeatsNotFoundException(AVAILABLE_SHOW_SEATS_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
-        User user = userMapper.convertUserResponseDtoToUserEntity(
-                userService.getUserById(reservationRequestDTO.getUserId())
-        );
-        Show show = showMapper.convertShowDetailedResponseDtoToShowEntity(
-                showService.getShowById(reservationRequestDTO.getShowId())
-        );
+        User user = userRepository.findById(reservationRequestDTO.getUserId())
+                .orElseThrow(() -> new UserNotFoundException(ExceptionConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        Show show = showRepository.findById(reservationRequestDTO.getShowId())
+                .orElseThrow(() -> new ShowNotFoundException(ExceptionConstants.SHOW_NOT_FOUND, HttpStatus.NOT_FOUND));
+
         double totalAmount = showSeatService.bookSeatsAndReturnTotalAmount(showSeats);
 
         Theatre theatre = show.getTheatre();

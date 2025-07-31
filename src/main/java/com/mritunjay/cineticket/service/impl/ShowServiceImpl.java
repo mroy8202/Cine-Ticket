@@ -4,12 +4,12 @@ import com.mritunjay.cineticket.constants.ExceptionConstants;
 import com.mritunjay.cineticket.dto.show.ShowDetailedResponseDTO;
 import com.mritunjay.cineticket.dto.show.ShowRequestDTO;
 import com.mritunjay.cineticket.dto.show.ShowResponseDTO;
+import com.mritunjay.cineticket.exception.MovieNotFoundException;
 import com.mritunjay.cineticket.exception.ShowNotFoundException;
-import com.mritunjay.cineticket.mapper.movie.MovieMapper;
 import com.mritunjay.cineticket.mapper.show.ShowMapper;
 import com.mritunjay.cineticket.model.*;
+import com.mritunjay.cineticket.repository.MovieRepository;
 import com.mritunjay.cineticket.repository.ShowRepository;
-import com.mritunjay.cineticket.service.MovieService;
 import com.mritunjay.cineticket.service.ScreenService;
 import com.mritunjay.cineticket.service.ShowSeatService;
 import com.mritunjay.cineticket.service.ShowService;
@@ -25,21 +25,19 @@ import java.util.List;
 public class ShowServiceImpl implements ShowService {
 
     private final ShowRepository showRepository;
-    private final MovieService movieService;
+    private final MovieRepository movieRepository;
     private final ScreenService screenService;
     public final ShowSeatService showSeatService;
 
     private final ShowMapper showMapper;
-    private final MovieMapper movieMapper;
 
     @Autowired
-    ShowServiceImpl(ShowRepository showRepository, MovieService movieService, ScreenService screenService, ShowSeatService showSeatService, ShowMapper showMapper, MovieMapper movieMapper) {
+    ShowServiceImpl(ShowRepository showRepository, MovieRepository movieRepository, ScreenService screenService, ShowSeatService showSeatService, ShowMapper showMapper) {
         this.showRepository = showRepository;
-        this.movieService = movieService;
+        this.movieRepository = movieRepository;
         this.screenService = screenService;
         this.showSeatService = showSeatService;
         this.showMapper = showMapper;
-        this.movieMapper = movieMapper;
     }
 
     @Override
@@ -84,9 +82,8 @@ public class ShowServiceImpl implements ShowService {
     @Override
     public ShowDetailedResponseDTO createNewShow(ShowRequestDTO showRequestDTO) {
         // Get the movie
-        Movie movie = movieMapper.convertMovieResponseDtoToMovieEntity(
-                movieService.getMovieById(showRequestDTO.getMovieId())
-        );
+        Movie movie = movieRepository.findById(showRequestDTO.getMovieId())
+                        .orElseThrow(() -> new MovieNotFoundException(ExceptionConstants.MOVIE_NOT_FOUND, HttpStatus.NOT_FOUND));
         movie.setTotalBookings(0);
 
         // Get the screen
@@ -118,9 +115,8 @@ public class ShowServiceImpl implements ShowService {
     @Override
     public ShowDetailedResponseDTO updateShowById(Long showId, ShowRequestDTO showRequestDTO) {
         // Get the movie
-        Movie movie = movieMapper.convertMovieResponseDtoToMovieEntity(
-                movieService.getMovieById(showRequestDTO.getMovieId())
-        );
+        Movie movie = movieRepository.findById(showRequestDTO.getMovieId())
+                .orElseThrow(() -> new MovieNotFoundException(ExceptionConstants.MOVIE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         Show updatedShow = showRepository
                 .findById(showId)

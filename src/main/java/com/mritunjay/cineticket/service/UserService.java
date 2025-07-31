@@ -22,10 +22,16 @@ public interface UserService {
     // Delete User By Id
     void deleteUserById(Long userId);
 
-    // Promote User
+    // Promote User role
     void promoteUser(User user);
+
+    // Demote User role
+    void demoteUser(User user)
 
     // Get User By Username
     User getUserByUserName(String userName);
+
+    // Is User Present By Username or UserEmail
+    boolean isUserPresentByUserNameOrUserEmail(String userName, String userEmail);
 
 }

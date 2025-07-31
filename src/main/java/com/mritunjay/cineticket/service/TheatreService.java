@@ -17,7 +17,7 @@ public interface TheatreService {
     TheatreDetailedResponseDTO createNewTheatre(TheatreRequestDTO theatreRequestDTO);
 
     // Update Theatre By id
-    TheatreDetailedResponseDTO updateTheatreById(Long theatreId, TheatreRequestDTO theatreRequestDTO);
+    TheatreDetailedResponseDTO updateTheatreById(Long theatreId, TheatreUpdateRequestDTO theatreUpdateRequestDTO);
 
     // Delete Theatre By id
     void deleteTheatreById(Long userId);

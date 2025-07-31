@@ -26,7 +26,7 @@ public class Theatre {
 
     private Double totalRevenue;
 
-    @OneToMany(mappedBy = "theatre", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "theatre", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<TheatreVsAdmin> theatreAdmins;
 
     @OneToMany(mappedBy = "theatre", cascade = CascadeType.ALL)

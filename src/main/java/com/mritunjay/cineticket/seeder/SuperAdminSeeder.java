@@ -1,6 +1,7 @@
 package com.mritunjay.cineticket.seeder;
 
 import com.mritunjay.cineticket.enums.UserRole;
+import com.mritunjay.cineticket.enums.UserStatus;
 import com.mritunjay.cineticket.model.User;
 import com.mritunjay.cineticket.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ public class SuperAdminSeeder implements ApplicationListener<ContextRefreshedEve
                 .firstName("Super")
                 .lastName("Admin")
                 .userRole(UserRole.ROLE_SUPER_ADMIN)
+                .userStatus(UserStatus.ACTIVE)
                 .build();
 
         userRepository.save(superAdmin);

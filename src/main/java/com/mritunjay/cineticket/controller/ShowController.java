@@ -121,7 +121,7 @@ public class ShowController {
                 );
     }
 
-    @PreAuthorize("@userRoleValidationService.isUserHavePermissionToPerformWriteOperationForScreen(#showRequestDTO.screenId)")
+    @PreAuthorize("@userRoleValidationService.doesUserHavePermissionToPerformWriteOperationForScreen(#showRequestDTO.screenId)")
     @PostMapping("/show/create")
     public ResponseEntity<APIResponseDTO> createNewShow(
             @RequestBody ShowRequestDTO showRequestDTO
@@ -138,7 +138,7 @@ public class ShowController {
                 );
     }
 
-    @PreAuthorize("@userRoleValidationService.isUserHavePermissionToPerformWriteOperationForShow(#showId)")
+    @PreAuthorize("@userRoleValidationService.doesUserHavePermissionToPerformWriteOperationForShow(#showId)")
     @PutMapping("/show/{showId}")
     public ResponseEntity<APIResponseDTO> updateShowById(
             @PathVariable Long showId,
@@ -156,7 +156,7 @@ public class ShowController {
                 );
     }
 
-    @PreAuthorize("@userRoleValidationService.isUserHavePermissionToPerformWriteOperationForShow(#showId)")
+    @PreAuthorize("@userRoleValidationService.doesUserHavePermissionToPerformWriteOperationForShow(#showId)")
     @DeleteMapping("/show/{showId}")
     public ResponseEntity<APIResponseDTO> deleteShowById(
             @PathVariable Long showId

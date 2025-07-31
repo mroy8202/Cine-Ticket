@@ -8,6 +8,7 @@ import com.mritunjay.cineticket.mapper.screen.ScreenMapper;
 import com.mritunjay.cineticket.mapper.theatre.TheatreMapper;
 import com.mritunjay.cineticket.model.Show;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,7 +19,7 @@ public class ShowMapper {
     private final ScreenMapper screenMapper;
 
     @Autowired
-    public ShowMapper(MovieMapper movieMapper, TheatreMapper theatreMapper, ScreenMapper screenMapper) {
+    public ShowMapper(MovieMapper movieMapper, @Lazy TheatreMapper theatreMapper, ScreenMapper screenMapper) {
         this.movieMapper = movieMapper;
         this.theatreMapper = theatreMapper;
         this.screenMapper = screenMapper;
@@ -55,23 +56,4 @@ public class ShowMapper {
                 .build();
     }
 
-    // Show Detailed Response Dto -> Show Entity
-    public Show convertShowDetailedResponseDtoToShowEntity(ShowDetailedResponseDTO showDetailedResponseDTO) {
-        return Show.builder()
-                .showId(showDetailedResponseDTO.getShowId())
-                .movie(movieMapper.convertMovieSummaryResponseDtoToMovieEntity(showDetailedResponseDTO.getMovie()))
-                .theatre(theatreMapper.convertTheatreSummaryResponseDtoToTheatreEntity(showDetailedResponseDTO.getTheatre()))
-                .screen(screenMapper.convertScreenSummaryResponseDtoToScreenEntity(showDetailedResponseDTO.getScreen()))
-                .startTime(showDetailedResponseDTO.getStartTime())
-                .endTime(showDetailedResponseDTO.getEndTime())
-                .build();
-    }
-
-    // Show Summary Response Dto -> Show Entity
-    public Show convertShowSummaryResponseDtoToShowEntity(ShowSummaryResponseDTO showSummaryResponseDTO) {
-        return Show.builder()
-                .showId(showSummaryResponseDTO.getShowId())
-                .movie(movieMapper.convertMovieSummaryResponseDtoToMovieEntity(showSummaryResponseDTO.getMovie()))
-                .build();
-    }
 }

@@ -65,7 +65,7 @@ public class TheatreServiceImpl implements TheatreService {
                 theatreRequestDTO.getTheatreLocation()).isPresent()) {
             throw new TheatreConflictException(ExceptionConstants.THEATRE_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
-        
+
         // Step 1: Fetch user who will become theatre admin
         User theatreAdmin = userRepository.findById(theatreRequestDTO.getTheatreAdminId())
                 .orElseThrow(() -> new UserNotFoundException(ExceptionConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
@@ -150,8 +150,10 @@ public class TheatreServiceImpl implements TheatreService {
                 .findById(theatreAdminRequestDTO.getTheatreId())
                 .map(theatre -> {
                     List<TheatreVsAdmin> theatreAdmins = theatre.getTheatreAdmins();
-                    TheatreVsAdmin theatreVsAdmin = createTheatreVsAdmin(theatre, theatreAdmin); // builds a TheatreVsAdmin object which has to be removed
-                    theatreAdmins.remove(theatreVsAdmin);
+
+                    theatreAdmins.removeIf(theatreVsAdmin ->
+                        theatreVsAdmin.getUser().getUserId().equals(theatreAdminRequestDTO.getUserId())
+                    );
                     theatre.setTheatreAdmins(theatreAdmins);
 
                     return theatreRepository.save(theatre);

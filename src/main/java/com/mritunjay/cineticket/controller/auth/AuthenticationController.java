@@ -4,6 +4,8 @@ import com.mritunjay.cineticket.dto.auth.AuthRequestDTO;
 import com.mritunjay.cineticket.dto.auth.AuthResponseDTO;
 import com.mritunjay.cineticket.dto.user.UserRequestDTO;
 import com.mritunjay.cineticket.service.auth.AuthenticationService;
+import com.mritunjay.cineticket.service.auth.TokenBlacklist;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,11 +22,13 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
     private final AuthenticationManager authenticationManager;
+    private final TokenBlacklist tokenBlacklist;
 
     @Autowired
-    public AuthenticationController(AuthenticationService authenticationService, AuthenticationManager authenticationManager) {
+    public AuthenticationController(AuthenticationService authenticationService, AuthenticationManager authenticationManager, TokenBlacklist tokenBlacklist) {
         this.authenticationService = authenticationService;
         this.authenticationManager = authenticationManager;
+        this.tokenBlacklist = tokenBlacklist;
     }
 
     @PostMapping("/signup")
@@ -64,4 +68,17 @@ public class AuthenticationController {
                 );
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+
+        if(authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            tokenBlacklist.blacklistToken(token);
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("Logged out successfully");
+    }
 }

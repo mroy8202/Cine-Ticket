@@ -1,6 +1,7 @@
 package com.mritunjay.cineticket.filter;
 
 import com.mritunjay.cineticket.model.User;
+import com.mritunjay.cineticket.service.auth.TokenBlacklist;
 import com.mritunjay.cineticket.service.impl.UserServiceImpl;
 import com.mritunjay.cineticket.service.auth.JWTService;
 import jakarta.servlet.FilterChain;
@@ -21,11 +22,13 @@ public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTService jwtService;
     private final UserServiceImpl userService;
+    private final TokenBlacklist tokenBlacklist;
 
     @Autowired
-    JWTFilter(JWTService jwtService, UserServiceImpl userService) {
+    JWTFilter(JWTService jwtService, UserServiceImpl userService, TokenBlacklist tokenBlacklist) {
         this.jwtService = jwtService;
         this.userService = userService;
+        this.tokenBlacklist = tokenBlacklist;
     }
 
     @Override
@@ -34,6 +37,12 @@ public class JWTFilter extends OncePerRequestFilter {
 
         if(authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwt = authHeader.substring(7);
+
+            if(tokenBlacklist.isBlacklisted(jwt)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token has been invalidated");
+                return ;
+            }
+
             String userName = jwtService.extractUserNameFromJwt(jwt);
 
             if(userName != null && !userName.isEmpty()) {

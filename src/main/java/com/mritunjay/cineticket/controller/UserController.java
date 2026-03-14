@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,12 +17,10 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    UserController(UserService userService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    UserController(UserService userService) {
         this.userService = userService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Secured({"ROLE_SUPER_ADMIN"})
@@ -51,10 +48,6 @@ public class UserController {
     public ResponseEntity<APIResponseDTO> createNewUser(
             @RequestBody UserRequestDTO userRequestDTO
     ) {
-
-        String encodedPassword = bCryptPasswordEncoder.encode(userRequestDTO.getPassword());
-        userRequestDTO.setPassword(encodedPassword);
-
         UserResponseDTO newUser = userService.createNewUser(userRequestDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -88,11 +81,6 @@ public class UserController {
             @PathVariable Long userId,
             @RequestBody UserRequestDTO userRequestDTO
     ) {
-        if(userRequestDTO.getPassword() != null) {
-            String encodedPassword = bCryptPasswordEncoder.encode(userRequestDTO.getPassword());
-            userRequestDTO.setPassword(encodedPassword);
-        }
-
         UserResponseDTO updatedUser = userService.updateUserById(userId, userRequestDTO);
 
         return ResponseEntity

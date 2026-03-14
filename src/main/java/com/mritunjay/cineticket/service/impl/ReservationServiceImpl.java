@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,6 +53,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional
     public ReservationResponseDTO createNewReservation(ReservationRequestDTO reservationRequestDTO) {
         // Get all ShowSeat id's
         List<Long> showSeatIds = reservationRequestDTO
@@ -60,9 +62,8 @@ public class ReservationServiceImpl implements ReservationService {
                 .map(ShowSeatRequestDTO::getSeatId)
                 .toList();
 
-        List<ShowSeat> showSeats = showSeatService.getAvailableSeats(showSeatIds);
-
         showSeatService.acquireLocksForShowSeats(showSeatIds);
+        List<ShowSeat> showSeats = showSeatService.getAvailableSeats(showSeatIds);
 
         if(showSeats.size() != showSeatIds.size()) {
             showSeatService.removeLocksForShowSeats(showSeatIds);
@@ -70,10 +71,16 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         User user = userRepository.findById(reservationRequestDTO.getUserId())
-                .orElseThrow(() -> new UserNotFoundException(ExceptionConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> {
+                    showSeatService.removeLocksForShowSeats(showSeatIds);
+                    return new UserNotFoundException(ExceptionConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+                });
 
         Show show = showRepository.findById(reservationRequestDTO.getShowId())
-                .orElseThrow(() -> new ShowNotFoundException(ExceptionConstants.SHOW_NOT_FOUND, HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> {
+                    showSeatService.removeLocksForShowSeats(showSeatIds);
+                    return new ShowNotFoundException(ExceptionConstants.SHOW_NOT_FOUND, HttpStatus.NOT_FOUND);
+                });
 
         double totalAmount = showSeatService.bookSeatsAndReturnTotalAmount(showSeats);
 
@@ -93,9 +100,9 @@ public class ReservationServiceImpl implements ReservationService {
                 .totalAmount(totalAmount)
                 .build();
 
-        showSeatService.removeLocksForShowSeats(showSeatIds);
-
         Reservation savedReservation = reservationRepository.save(reservation);
+
+        showSeatService.removeLocksForShowSeats(showSeatIds);
 
         return reservationMapper.convertReservationEntityToReservationResponseDto(savedReservation);
     }

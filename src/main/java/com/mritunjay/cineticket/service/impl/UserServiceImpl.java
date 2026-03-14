@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,11 +25,13 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    UserServiceImpl(UserRepository userRepository, UserMapper userMapper, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
@@ -42,6 +45,9 @@ public class UserServiceImpl implements UserService {
         if(userRepository.findByUsernameOrUserEmail(userRequestDTO.getUsername(), userRequestDTO.getUserEmail()).isPresent()) {
             throw new UserConflictException("User with the same username or email already exists", HttpStatus.CONFLICT);
         }
+
+        // encode password
+        userRequestDTO.setPassword(bCryptPasswordEncoder.encode(userRequestDTO.getPassword()));
 
         // Convert UserRequestDTO to Entity
         User newUser = userMapper.convertUserRequestDtoToUserEntity(userRequestDTO);
@@ -78,7 +84,9 @@ public class UserServiceImpl implements UserService {
         // update the fields
         userToBeUpdated.setFirstName(userRequestDTO.getFirstName());
         userToBeUpdated.setLastName(userRequestDTO.getLastName());
-        userToBeUpdated.setPassword(userRequestDTO.getPassword());
+        if(userRequestDTO.getPassword() != null) {
+            userToBeUpdated.setPassword(bCryptPasswordEncoder.encode(userRequestDTO.getPassword()));
+        }
         userToBeUpdated.setUserUpdatedAt(LocalDateTime.now());
 
         // save in db

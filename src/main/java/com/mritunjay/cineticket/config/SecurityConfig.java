@@ -28,6 +28,9 @@ public class SecurityConfig {
     private final JWTFilter jwtFilter;
 
     @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
     SecurityConfig(AppUserDetailsService appUserDetailsService, JWTFilter jwtFilter) {
         this.appUserDetailsService = appUserDetailsService;
         this.jwtFilter = jwtFilter;
@@ -59,14 +62,9 @@ public class SecurityConfig {
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userDetailsService());
-        daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder());
+        daoAuthenticationProvider.setPasswordEncoder(bCryptPasswordEncoder);
 
         return daoAuthenticationProvider;
-    }
-
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean

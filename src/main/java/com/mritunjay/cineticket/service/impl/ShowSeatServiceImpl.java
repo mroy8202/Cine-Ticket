@@ -45,10 +45,10 @@ public class ShowSeatServiceImpl implements ShowSeatService {
 
     @Override
     public List<ShowSeat> getAvailableSeats(List<Long> showSeatsIds) {
-        return showSeatRepository.findAllById(showSeatsIds)
-                .stream()
-                .filter(showSeat -> showSeat.getSeatStatus().equals(SeatStatus.AVAILABLE))
-                .toList();
+        return showSeatRepository.findByShowSeatIdInAndSeatStatus(
+                showSeatsIds,
+                SeatStatus.AVAILABLE
+        );
     }
 
     @Override
@@ -60,15 +60,22 @@ public class ShowSeatServiceImpl implements ShowSeatService {
             amount += showSeat.getSeat().getSeatPrice();
         }
 
+        showSeatRepository.saveAll(showSeats);
         return amount;
     }
 
     @Override
     public void acquireLocksForShowSeats(List<Long> showSeatIds) {
-        for (Long showSeatId : showSeatIds) {
+        List<Long> sortedIds = showSeatIds
+                .stream()
+                .sorted()
+                .toList();
+
+        for (Long showSeatId : sortedIds) {
             ReentrantLock reentrantLock = seatLock.getShowSeatLock(showSeatId);
 
             if(!reentrantLock.tryLock()) {
+                releaseAcquiredLocks(sortedIds, showSeatId);
                 throw new SeatAlreadyLockedException(ExceptionConstants.SEAT_ALREADY_LOCKED, HttpStatus.CONFLICT);
             }
         }
@@ -78,6 +85,17 @@ public class ShowSeatServiceImpl implements ShowSeatService {
     public void removeLocksForShowSeats(List<Long> showSeatIds) {
         for (Long showSeatId : showSeatIds) {
             seatLock.removeLockForShowSeat(showSeatId);
+        }
+    }
+
+    private void releaseAcquiredLocks(List<Long> sortedIds, Long failedAtId) {
+        for(Long id : sortedIds) {
+            if(id.equals(failedAtId)) break;
+
+            ReentrantLock lock = seatLock.getShowSeatLock(id);
+            if(lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
     }
 

@@ -10,6 +10,14 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Data
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "unique_theatre_name_location",
+                        columnNames = {"theatreName", "theatreLocation"}
+                )
+        }
+)
 public class Theatre {
 
     @Id

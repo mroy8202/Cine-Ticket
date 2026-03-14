@@ -3,6 +3,7 @@ package com.mritunjay.cineticket.service.impl;
 import com.mritunjay.cineticket.constants.ExceptionConstants;
 import com.mritunjay.cineticket.dto.theatre.*;
 import com.mritunjay.cineticket.dto.user.TheatreAdminRequestDTO;
+import com.mritunjay.cineticket.exception.TheatreConflictException;
 import com.mritunjay.cineticket.exception.TheatreNotFoundException;
 import com.mritunjay.cineticket.exception.UserNotFoundException;
 import com.mritunjay.cineticket.mapper.theatre.TheatreMapper;
@@ -58,6 +59,13 @@ public class TheatreServiceImpl implements TheatreService {
 
     @Override
     public TheatreDetailedResponseDTO createNewTheatre(TheatreRequestDTO theatreRequestDTO) {
+        // step 0: Check combination of name + location
+        if(theatreRepository.findByTheatreNameAndTheatreLocation(
+                theatreRequestDTO.getTheatreName(),
+                theatreRequestDTO.getTheatreLocation()).isPresent()) {
+            throw new TheatreConflictException(ExceptionConstants.THEATRE_ALREADY_EXISTS, HttpStatus.CONFLICT);
+        }
+        
         // Step 1: Fetch user who will become theatre admin
         User theatreAdmin = userRepository.findById(theatreRequestDTO.getTheatreAdminId())
                 .orElseThrow(() -> new UserNotFoundException(ExceptionConstants.USER_NOT_FOUND, HttpStatus.NOT_FOUND));

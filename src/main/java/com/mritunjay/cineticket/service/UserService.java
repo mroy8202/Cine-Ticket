@@ -26,7 +26,7 @@ public interface UserService {
     void promoteUser(User user);
 
     // Demote User role
-    void demoteUser(User user)
+    void demoteUser(User user);
 
     // Get User By Username
     User getUserByUserName(String userName);

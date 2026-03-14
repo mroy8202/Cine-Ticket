@@ -3,11 +3,11 @@ package com.mritunjay.cineticket.service.auth;
 import com.mritunjay.cineticket.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
@@ -17,19 +17,9 @@ public class JWTService {
 
     private final SecretKey secretKey;
 
-    public JWTService() {
-        KeyGenerator kg = getKeyGenerator();
-        secretKey = kg.generateKey();
-    }
-
-    public KeyGenerator getKeyGenerator() {
-        try{
-            KeyGenerator kg = KeyGenerator.getInstance("HmacSHA256");
-            kg.init(256);
-            return kg;
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+    public JWTService(@Value("${jwt.secret}") String secret) {
+        // Keys.hmacShaKeyFor converts your string secret into a SecretKey
+        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String generateJWTToken(User user) {

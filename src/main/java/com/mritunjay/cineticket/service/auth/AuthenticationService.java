@@ -31,16 +31,11 @@ public class AuthenticationService {
             throw new UserConflictException("User with the same username or email already exists", HttpStatus.CONFLICT);
         }
 
-        encodePassword(userRequestDTO);
         User newUser = userMapper.convertUserResponseDtoToUserEntity(
                 userService.createNewUser(userRequestDTO)
         );
 
         return jwtService.generateJWTToken(newUser);
-    }
-
-    public void encodePassword(UserRequestDTO userRequestDTO) {
-        userRequestDTO.setPassword(bCryptPasswordEncoder.encode(userRequestDTO.getPassword()));
     }
 
     public String generateTokenForUser(String userName) {
